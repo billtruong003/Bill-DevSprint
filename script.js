@@ -21,33 +21,9 @@ window.gapiLoaded = () => {
 };
 
 window.gisLoaded = () => {
-    async function handleAuthResponse(tokenResponse) {
-        if (tokenResponse.error) {
-            alert("Lỗi xác thực Google. Vui lòng thử lại.");
-            console.error("Google Auth Error:", tokenResponse.error);
-            return;
-        }
-        gapi.client.setToken(tokenResponse);
-        authScreen.style.display = 'none';
-        showLoader('Đang khởi tạo ứng dụng...');
-        try {
-            await startApp();
-        } catch (error) {
-            console.error("Failed to start app:", error);
-            alert("Không thể khởi động ứng dụng. Vui lòng kiểm tra kết nối và thử lại.");
-            hideLoader();
-            authScreen.style.display = 'flex';
-        }
-    }
-
-    tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: GOOGLE_CLIENT_ID,
-        scope: GOOGLE_SCOPES,
-        callback: handleAuthResponse,
-    });
+    // Chúng ta sẽ gọi một hàm khởi tạo từ bên trong DOMContentLoaded
+    document.dispatchEvent(new CustomEvent('gisDidLoaded'));
     gisInited = true;
-
-    // Kiểm tra và kích hoạt nút đăng nhập
     const authBtn = document.getElementById('auth-btn');
     if (authBtn && gapiInited) authBtn.disabled = false;
 };
@@ -120,10 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const wallpaperLoader = document.getElementById('wallpaper-loader');
     const wallpaperItemTemplate = document.getElementById('wallpaper-item-template');
     // #endregion
-
-    let tokenClient;
-    let gapiInited = false;
-    let gisInited = false;
 
     let metaState = {};
     let state = {};
@@ -320,6 +292,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     // #endregion
+
+    async function handleAuthResponse(tokenResponse) {
+        if (tokenResponse.error) {
+            alert("Lỗi xác thực Google. Vui lòng thử lại.");
+            console.error("Google Auth Error:", tokenResponse.error);
+            return;
+        }
+        gapi.client.setToken(tokenResponse);
+        authScreen.style.display = 'none';
+        showLoader('Đang khởi tạo ứng dụng...');
+        try {
+            await startApp();
+        } catch (error) {
+            console.error("Failed to start app:", error);
+            alert("Không thể khởi động ứng dụng. Vui lòng kiểm tra kết nối và thử lại.");
+            hideLoader();
+            authScreen.style.display = 'flex';
+        }
+    }
+
+    function initializeGisClient() {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: GOOGLE_CLIENT_ID,
+            scope: GOOGLE_SCOPES,
+            callback: handleAuthResponse, // Bây giờ hàm này đã ở đúng phạm vi
+        });
+    }
+
+    document.addEventListener('gisDidLoaded', initializeGisClient);
+
+    if (gisInited) {
+        initializeGisClient();
+    }
 
     function handleAuthClick() {
         if (gapiInited && gisInited) {
@@ -1689,9 +1694,8 @@ document.addEventListener('DOMContentLoaded', () => {
             applyBackground(randomWallpaperData);
         }
         authBtn.disabled = true;
-        authBtn.addEventListener('click', handleAuthClick);
+        authBtn.addEventListener('click', handleAuthClick); // Gắn sự kiện click
     }
-
     init();
     // #endregion
 });
