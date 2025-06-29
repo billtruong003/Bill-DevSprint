@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<!-- === THAY ĐỔI: Thêm class `dark-theme` mặc định để auth screen là nền tối === -->
+<html lang="vi" class="dark-theme">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Task Management - Drive Powered</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js" defer></script>
+    <script src="https://accounts.google.com/gsi/client" onload="gisLoaded()" async defer></script>
+    <script src="https://apis.google.com/js/api.js" onload="gapiLoaded()" async defer></script>
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+    <video id="background-video" muted loop playsinline></video>
+    <div id="wallpaper-info"></div>
+    <div id="auth-screen">
+        <div class="auth-box">
+            <h1>
+                <img src="./asset/logo.png" alt="Bill's DevSprint" class="auth-logo-img">
+            </h1>
+            <p>From a developer, for developers. The sprint board that puts you in control.</p>
+            <button id="auth-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                    style="margin-right: 8px;">
+                    <path fill="currentColor"
+                        d="M21.35,11.1H12.18V13.83H18.69C18.36,17.64 15.19,19.27 12.19,19.27C8.36,19.27 5,16.25 5,12C5,7.9 8.2,4.73 12.19,4.73C15.29,4.73 17.1,6.7 17.1,6.7L19,4.72C19,4.72 16.56,2 12.19,2C6.42,2 2.03,6.8 2.03,12C2.03,17.05 6.16,22 12.19,22C17.6,22 21.54,18.33 21.54,12.33C21.54,11.69 21.48,11.38 21.35,11.1Z" />
+                </svg>
+                Đăng nhập bằng Google
+            </button>
+        </div>
+    </div>
+
+    <div id="global-loader" class="hidden">
+        <div class="spinner"></div>
+        <p id="global-loader-text">Đang tải...</p>
+    </div>
+
+    <div id="app-container" style="display: none;">
+        <header class="app-header">
+            <div id="board-switcher" class="board-switcher">
+                <button id="board-switcher-btn" class="board-switcher-btn">
+                    <span id="current-board-name">Tên Board</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </button>
+                <div id="board-switcher-dropdown" class="context-menu">
+                    <ul id="board-list">
+                    </ul>
+                    <hr class="menu-divider">
+                    <ul>
+                        <li data-action="rename-board">Đổi tên Board hiện tại...</li>
+                        <li data-action="create-board">＋ Tạo Board mới...</li>
+                        <li data-action="delete-board" class="danger">Xóa Board hiện tại...</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <button id="add-list-btn" class="header-btn">＋ Thêm Cột</button>
+                <button id="settings-btn" class="header-btn icon-btn" aria-label="Settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+        <main id="board-container" class="board-container"></main>
+    </div>
+
+    <!-- TEMPLATES -->
+    <template id="list-template">
+        <div class="list" data-list-id="">
+            <div class="list-header">
+                <div class="list-title-wrapper">
+                    <h2 class="list-title-text">List Title</h2><span class="card-count"></span>
+                </div>
+                <div class="list-actions">
+                    <button class="list-action-btn list-options-btn" aria-label="List options"><svg
+                            xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="1"></circle>
+                            <circle cx="12" cy="5" r="1"></circle>
+                            <circle cx="12" cy="19" r="1"></circle>
+                        </svg></button>
+                    <button class="list-action-btn delete-list-btn hidden" aria-label="Delete list">×</button>
+                </div>
+            </div>
+            <div class="cards-container"></div>
+            <div class="list-footer">
+                <div class="add-card-form-container" style="display: none;">
+                    <textarea class="add-card-textarea" placeholder="Nhập tiêu đề cho thẻ này..."></textarea>
+                    <div class="add-card-controls"><button class="primary-btn add-card-submit-btn">Thêm
+                            thẻ</button><button class="add-card-cancel-btn" aria-label="Cancel">×</button></div>
+                </div>
+                <button class="add-card-btn">＋ Thêm thẻ</button>
+            </div>
+        </div>
+    </template>
+
+    <template id="card-template">
+        <div class="card" draggable="true" data-card-id="">
+            <div class="card-label-strip"></div>
+            <div class="card-content">
+                <p class="card-title-text"></p>
+            </div>
+            <button class="card-action-btn edit-card-btn" aria-label="Edit card title"><svg
+                    xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg></button>
+        </div>
+    </template>
+    <template id="wallpaper-item-template">
+        <div class="wallpaper-item" tabindex="0">
+            <img class="wallpaper-thumbnail" src="" alt="Thumbnail hình nền" loading="lazy">
+            <div class="wallpaper-overlay">
+                <p class="wallpaper-title"></p>
+                <div class="wallpaper-selected-indicator">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </template>
+    <!-- CARD DETAIL MODAL (UPDATED) -->
+    <div id="card-detail-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true"
+        aria-labelledby="card-detail-title">
+        <div class="modal-content modal-lg">
+            <header class="modal-header">
+                <h2 id="card-detail-title" class="card-detail-title-header">Card Title</h2><button
+                    class="modal-close-btn" aria-label="Close card details">×</button>
+            </header>
+            <div class="modal-body">
+                <div class="card-detail-main-content">
+                    <div class="card-detail-section">
+                        <h3 class="card-detail-section-title">Mô tả</h3>
+                        <div id="quill-toolbar">
+                            <span class="ql-formats"><button class="ql-bold"></button><button
+                                    class="ql-italic"></button><button class="ql-link"></button><button
+                                    class="ql-blockquote"></button><button class="ql-code-block"></button></span>
+                            <span class="ql-formats"><button class="ql-list" value="ordered"></button><button
+                                    class="ql-list" value="bullet"></button></span>
+                            <span class="ql-formats">
+                                <button id="quill-attach-file-btn" title="Đính kèm từ máy tính"><svg
+                                        xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path
+                                            d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48">
+                                        </path>
+                                    </svg></button>
+                                <button id="quill-uppercase-btn" title="Chữ hoa">AA</button>
+                                <button id="quill-lowercase-btn" title="Chữ thường">aa</button>
+                            </span>
+                        </div>
+                        <div id="card-detail-description" class="editable-content"></div>
+                    </div>
+
+                    <div class="card-detail-section" id="attachments-section">
+                        <h3 class="card-detail-section-title">Tệp đính kèm (Kéo-thả vào đây để upload)</h3>
+                        <div id="attachments-gallery-container" class="attachments-grid">
+                            <!-- Attachments sẽ được chèn động vào đây -->
+                        </div>
+                    </div>
+                </div>
+                <div class="card-detail-sidebar">
+                    <div class="card-detail-section">
+                        <h3 class="card-detail-section-title">Nhãn</h3>
+                        <div id="card-detail-labels-container">
+                            <p>Không có nhãn.</p>
+                        </div>
+                    </div>
+                    <div class="card-detail-section">
+                        <h3 class="card-detail-section-title">Thông tin</h3>
+                        <dl id="card-metadata" class="metadata-grid"></dl>
+                    </div>
+                </div>
+            </div>
+            <footer class="modal-footer"><button id="card-detail-delete-btn" class="danger-btn">Xoá thẻ
+                    này</button><button id="card-detail-save-btn" class="primary-btn">Lưu & Đóng</button></footer>
+        </div>
+    </div>
+
+    <!-- PREVIEW MODAL (LIGHTBOX) -->
+    <div id="preview-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true"
+        aria-labelledby="preview-title">
+        <div class="modal-content modal-viewer">
+            <header class="modal-header">
+                <h2 id="preview-title">Media Viewer</h2>
+                <button class="modal-close-btn" aria-label="Close viewer">×</button>
+            </header>
+            <div id="preview-content" class="media-viewer-body">
+                <!-- Content (img, video, etc.) sẽ được chèn vào đây -->
+            </div>
+            <footer class="modal-footer">
+                <!-- === THAY ĐỔI: Đảm bảo nút này có ID để JS cập nhật link -->
+                <a id="media-viewer-download-btn" href="#" download target="_blank" class="primary-btn">Tải xuống</a>
+            </footer>
+        </div>
+    </div>
+
+    <!-- CREATE BOARD MODAL -->
+    <div id="create-board-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true"
+        aria-labelledby="create-board-title">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h2 id="create-board-title">Tạo Board mới</h2><button class="modal-close-btn"
+                    aria-label="Close">×</button>
+            </header>
+            <div class="modal-body">
+                <form id="create-board-form" novalidate>
+                    <div class="control-group">
+                        <label for="new-board-name-input">Tên Board</label>
+                        <input type="text" id="new-board-name-input" placeholder="Ví dụ: Kế hoạch dự án X" required>
+                    </div>
+                </form>
+            </div>
+            <footer class="modal-footer"><button type="submit" form="create-board-form" class="primary-btn">Tạo
+                    Board</button></footer>
+        </div>
+    </div>
+
+    <!-- SETTINGS MODAL (UPDATED) -->
+    <div id="settings-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true"
+        aria-labelledby="settings-title">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h2 id="settings-title">Cài đặt</h2><button class="modal-close-btn"
+                    aria-label="Close settings">×</button>
+            </header>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h3>Giao diện</h3>
+                    <div class="control-group"><label for="theme-switcher">Theme</label>
+                        <select id="theme-switcher">
+                            <option value="system">Hệ thống</option>
+                            <option value="light">Sáng</option>
+                            <option value="dark">Tối</option>
+                            <!-- === THAY ĐỔI: Thêm option Tùy chỉnh === -->
+                            <option value="custom">Tùy chỉnh</option>
+                        </select>
+                    </div>
+
+                    <!-- === THAY ĐỔI: Thêm các điều khiển cho theme tùy chỉnh, mặc định ẩn đi === -->
+                    <div id="custom-theme-controls" class="hidden">
+                        <hr class="menu-divider">
+                        <p class="settings-description" style="margin-top: 16px;">Tinh chỉnh màu sắc cho theme của bạn.
+                            Thay
+                            đổi sẽ được xem trước trực tiếp.</p>
+                        <div class="control-group"><label for="custom-surface-1">Màu thẻ/modal</label><input
+                                type="color" id="custom-surface-1"></div>
+                        <div class="control-group"><label for="custom-surface-2">Màu cột</label><input type="color"
+                                id="custom-surface-2"></div>
+                        <div class="control-group"><label for="custom-surface-3">Màu nền chính</label><input
+                                type="color" id="custom-surface-3"></div>
+                        <div class="control-group"><label for="custom-text-primary">Màu chữ chính</label><input
+                                type="color" id="custom-text-primary"></div>
+                        <div class="control-group"><label for="custom-text-secondary">Màu chữ phụ</label><input
+                                type="color" id="custom-text-secondary"></div>
+                        <button id="reset-custom-theme-btn" class="header-btn" style="grid-column: 2;">Đặt lại về mặc
+                            định</button>
+                    </div>
+                    <!-- === KẾT THÚC THAY ĐỔI === -->
+
+                    <div class="control-group"><label for="primary-color-picker">Màu nhấn</label><input type="color"
+                            id="primary-color-picker"></div>
+                    <div class="control-group"><label for="bg-image-input">URL ảnh/video nền</label><input type="text"
+                            id="bg-image-input" placeholder="Dán link ảnh hoặc video (.mp4)..."></div>
+                    <div class="control-group">
+                        <label></label> <!-- Label trống để căn chỉnh -->
+                        <div>
+                            <button id="open-wallpaper-gallery-btn" class="header-btn" style="width: 100%;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" style="margin-right: 8px;">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                Chọn từ thư viện...
+                            </button>
+                        </div>
+                    </div>
+                    <div class="control-group"><label for="bg-image-alpha-slider">Độ mờ nền</label><input type="range"
+                            id="bg-image-alpha-slider" min="0" max="1" step="0.05"></div>
+                </div>
+                <div class="settings-section">
+                    <h3>Quản lý Nhãn</h3>
+                    <ul id="labels-list" class="labels-list-editor"></ul>
+                    <form id="add-label-form" class="add-label-form" novalidate><input type="text" id="new-label-name"
+                            placeholder="Tên nhãn mới..." required><input type="color" id="new-label-color"
+                            value="#4bce97"><button type="submit" class="primary-btn">Thêm</button></form>
+                </div>
+                <div class="settings-section">
+                    <h3>Tài khoản</h3>
+                    <p class="settings-description">Bạn đang đăng nhập và sử dụng dữ liệu từ Google Drive.</p>
+                    <div class="data-actions"><button id="logout-btn" class="danger-btn">Đăng xuất</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="wallpaper-gallery-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true"
+        aria-labelledby="wallpaper-gallery-title">
+        <div class="modal-content modal-xl">
+            <header class="modal-header">
+                <h2 id="wallpaper-gallery-title">Thư viện Hình nền động</h2>
+                <button class="modal-close-btn" aria-label="Close">×</button>
+            </header>
+            <div class="modal-body">
+                <div id="wallpaper-grid" class="wallpaper-grid-container">
+                    <!-- Các item wallpaper sẽ được chèn vào đây bằng JS -->
+                </div>
+                <div id="wallpaper-loader" class="wallpaper-loader">
+                    <div class="spinner-small"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- CONTEXT MENUS -->
+    <div id="card-context-menu" class="context-menu hidden">
+        <ul>
+            <li data-action="details">Mở chi tiết...</li>
+            <li data-action="delete" class="danger">Xóa thẻ</li>
+        </ul>
+    </div>
+    <div id="list-context-menu" class="context-menu hidden">
+        <ul>
+            <li data-action="sort-created-asc">Sắp xếp: Ngày tạo (Cũ nhất)</li>
+            <li data-action="sort-created-desc">Sắp xếp: Ngày tạo (Mới nhất)</li>
+            <li data-action="sort-updated-desc">Sắp xếp: Ngày sửa (Mới nhất)</li>
+            <li data-action="sort-title-asc">Sắp xếp: Tên thẻ (A-Z)</li>
+            <li data-action="delete-all-cards" class="danger">Xoá tất cả thẻ...</li>
+        </ul>
+    </div>
+</body>
+
+</html>

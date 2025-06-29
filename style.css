@@ -1,0 +1,1761 @@
+/**
+ * Bill Task Management - Advanced CSS
+ * Version: 8.1 (Refined UI/UX & Fixes)
+ * Author: AI Assistant
+ * Description: A complete UI/UX overhaul focusing on modern design principles,
+ *              systematic theming, micro-interactions, and maintainability.
+ */
+
+/* ==========================================================================
+   1. DESIGN SYSTEM & ROOT VARIABLES
+   ========================================================================== */
+
+:root {
+    /* HSL Color System - Change the hue to theme the entire app */
+    --primary-hue: 210;
+    --primary-saturation: 100%;
+
+    /* Background Overlay Opacity */
+    --bg-overlay-alpha: 0.3;
+
+    /* Base Font & Sizing */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-size-base: 16px;
+    --line-height-base: 1.5;
+
+    /* Border Radii */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-full: 9999px;
+
+    /* Transitions & Animations */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    --animation-card-drop: card-drop 300ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+
+    /* Derived Colors (DO NOT EDIT) */
+    --primary-color: hsl(var(--primary-hue), var(--primary-saturation), 50%);
+    --primary-color-light: hsl(var(--primary-hue), var(--primary-saturation), 65%);
+    --primary-color-dark: hsl(var(--primary-hue), var(--primary-saturation), 40%);
+    --primary-color-background: hsla(var(--primary-hue), var(--primary-saturation), 50%, 0.1);
+    --primary-color-background-hover: hsla(var(--primary-hue), var(--primary-saturation), 50%, 0.2);
+    --primary-color-border: hsla(var(--primary-hue), var(--primary-saturation), 50%, 0.4);
+
+    /* Semantic Colors */
+    --danger-hue: 358;
+    --danger-saturation: 75%;
+    --danger-color: hsl(var(--danger-hue), var(--danger-saturation), 59%);
+    --danger-color-hover: hsl(var(--danger-hue), var(--danger-saturation), 50%);
+    --danger-background: hsla(var(--danger-hue), var(--danger-saturation), 59%, 0.1);
+}
+
+/* ==========================================================================
+   2. THEME DEFINITIONS (LIGHT & DARK)
+   ========================================================================== */
+
+.light-theme {
+    /* Surfaces */
+    --surface-1: #ffffff;
+    /* Cards, Modals */
+    --surface-2: #f0f2f5;
+    /* Lists, Footers */
+    --surface-3: #e4e6eb;
+    /* App background */
+    --surface-modal: #f7f8f9;
+    /* Modal content background */
+
+    /* Text */
+    --text-primary: #1a1d21;
+    /* Main headings, body */
+    --text-secondary: #5f6670;
+    /* Subtitles, descriptions */
+    --text-tertiary: #8a919c;
+    /* Placeholders, disabled text */
+    --text-on-primary: #ffffff;
+    /* Text on primary buttons */
+    --text-link: var(--primary-color);
+
+    /* Borders */
+    --border-color-soft: #e4e6eb;
+    --border-color-medium: #d1d5db;
+    --border-color-hard: #c5c9d1;
+
+    /* Shadows */
+    --shadow-color: 220 3% 15%;
+    --shadow-elevation-low:
+        0.3px 0.5px 0.7px hsl(var(--shadow-color) / 0.1),
+        0.4px 0.8px 1.1px -1.2px hsl(var(--shadow-color) / 0.1),
+        1px 2px 2.9px -2.5px hsl(var(--shadow-color) / 0.1);
+    --shadow-elevation-medium:
+        0.3px 0.5px 0.7px hsl(var(--shadow-color) / 0.1),
+        0.8px 1.6px 2.3px -0.8px hsl(var(--shadow-color) / 0.1),
+        2.1px 4.1px 5.9px -1.7px hsl(var(--shadow-color) / 0.1),
+        5px 10px 14.5px -2.5px hsl(var(--shadow-color) / 0.1);
+}
+
+.dark-theme {
+    /* Surfaces */
+    --surface-1: #2c2f33;
+    /* Cards, Modals */
+    --surface-2: #23272a;
+    /* Lists, Footers */
+    --surface-3: #1e1f22;
+    /* App background */
+    --surface-modal: #282b2f;
+    /* Modal content background */
+
+    /* Text */
+    --text-primary: #f2f3f5;
+    --text-secondary: #b9bbbe;
+    --text-tertiary: #8e9297;
+    --text-on-primary: #ffffff;
+    --text-link: hsl(var(--primary-hue), var(--primary-saturation), 65%);
+
+    /* Borders */
+    --border-color-soft: #36393f;
+    --border-color-medium: #40444b;
+    --border-color-hard: #545861;
+
+    /* Shadows */
+    --shadow-color: 220 3% 5%;
+    --shadow-elevation-low:
+        0.3px 0.5px 0.7px hsl(var(--shadow-color) / 0.34),
+        0.4px 0.8px 1.1px -1.2px hsl(var(--shadow-color) / 0.34),
+        1px 2px 2.9px -2.5px hsl(var(--shadow-color) / 0.34);
+    --shadow-elevation-medium:
+        0.3px 0.5px 0.7px hsl(var(--shadow-color) / 0.36),
+        0.8px 1.6px 2.3px -0.8px hsl(var(--shadow-color) / 0.36),
+        2.1px 4.1px 5.9px -1.7px hsl(var(--shadow-color) / 0.36),
+        5px 10px 14.5px -2.5px hsl(var(--shadow-color) / 0.36);
+}
+
+/* ==========================================================================
+   3. KEYFRAMES & ANIMATIONS
+   ========================================================================== */
+
+@keyframes card-drop {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==========================================================================
+   4. BASE & GLOBAL STYLES
+   ========================================================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+*:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
+
+html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: var(--font-size-base);
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--surface-3);
+    color: var(--text-primary);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    overflow: hidden;
+    position: relative;
+    line-height: var(--line-height-base);
+    transition: background-color var(--transition-normal);
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: var(--surface-3);
+    opacity: var(--bg-overlay-alpha);
+    z-index: -1;
+    transition: background-color var(--transition-normal), opacity var(--transition-fast);
+    pointer-events: none;
+}
+
+#background-video {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: -2;
+    object-fit: cover;
+    transition: opacity var(--transition-slow);
+    opacity: 0;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ==========================================================================
+   5. SCROLLBAR STYLES
+   ========================================================================== */
+
+::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--border-color-medium);
+    border: 4px solid transparent;
+    background-clip: padding-box;
+    border-radius: var(--radius-full);
+}
+
+.board-container::-webkit-scrollbar-thumb {
+    border-color: var(--surface-3);
+}
+
+.dark-theme .board-container::-webkit-scrollbar-thumb {
+    border-color: var(--surface-3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--border-color-hard);
+}
+
+/* ==========================================================================
+   6. AUTH & GLOBAL LOADERS
+   ========================================================================== */
+
+#auth-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    animation: fadeIn var(--transition-slow);
+    padding: 24px;
+}
+
+.auth-box {
+    background-color: rgba(44, 47, 51, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    padding: 48px;
+    border-radius: var(--radius-lg);
+    text-align: center;
+    box-shadow: var(--shadow-elevation-medium);
+    max-width: 450px;
+    width: 100%;
+}
+
+.auth-box .logo-text {
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+
+.auth-box h1 {
+    margin: 0;
+}
+
+.auth-logo-img {
+    width: 300px;
+    height: auto;
+    margin-bottom: var(--space-xl, 24px);
+    object-fit: contain;
+}
+
+.auth-box p {
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    line-height: 1.6;
+}
+
+/* Auth Screen Button */
+#auth-btn {
+    /* Sử dụng các biến vừa định nghĩa */
+    background-color: var(--auth-btn-bg);
+    color: var(--auth-btn-text);
+    border: 1px solid var(--auth-btn-border);
+
+    /* Kế thừa các style chung khác từ .primary-btn nếu muốn */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    /* Làm nút to và rõ ràng hơn một chút */
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+#auth-btn:hover:not(:disabled) {
+    background-color: var(--auth-btn-bg);
+    border-color: #ff7d13;
+    color: #ff7d13;
+    /* Đổi màu chữ thành màu nhấn khi hover */
+}
+
+#auth-btn:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+#auth-btn:disabled {
+    background-color: var(--border-color-medium);
+    color: var(--text-tertiary);
+    cursor: not-allowed;
+}
+
+
+#global-loader {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    color: white;
+}
+
+#global-loader p {
+    margin-top: 16px;
+    font-weight: 500;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.spinner-small {
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--border-color-medium);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.saving-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--surface-1);
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-elevation-medium);
+    font-size: 0.9rem;
+    font-weight: 500;
+    z-index: 9998;
+    opacity: 0;
+    transition: opacity var(--transition-normal), transform var(--transition-normal);
+    transform: translateY(10px);
+    pointer-events: none;
+}
+
+.saving-indicator.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ==========================================================================
+   7. CORE APP LAYOUT
+   ========================================================================== */
+
+#app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.app-header {
+    flex-shrink: 0;
+    padding: 12px 24px;
+    background-color: hsla(0, 0%, 100%, 0.5);
+    backdrop-filter: blur(12px) saturate(1.8);
+    -webkit-backdrop-filter: blur(12px) saturate(1.8);
+    border-bottom: 1px solid var(--border-color-soft);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color var(--transition-normal), border-color var(--transition-normal);
+    position: relative;
+    z-index: 10;
+}
+
+.dark-theme .app-header {
+    background-color: hsla(220, 13%, 18%, 0.75);
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* ==========================================================================
+   8. BOARD SWITCHER (Dropdown Menu)
+   ========================================================================== */
+
+.board-switcher {
+    position: relative;
+}
+
+.board-switcher-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    transition: background-color var(--transition-fast);
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.board-switcher-btn:hover {
+    background-color: var(--primary-color-background-hover);
+}
+
+.board-switcher-btn svg {
+    color: var(--text-tertiary);
+    transition: transform var(--transition-fast);
+}
+
+.board-switcher.open .board-switcher-btn svg {
+    transform: rotate(180deg);
+}
+
+/* This is the new dropdown menu, replacing the old context menu */
+#board-switcher-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 1002;
+    min-width: 240px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.board-switcher.open #board-switcher-dropdown {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.menu-divider {
+    border: none;
+    border-top: 1px solid var(--border-color-soft);
+    margin: 8px 0;
+}
+
+/* ==========================================================================
+   9. BOARD, LISTS, CARDS
+   ========================================================================== */
+
+.board-container {
+    flex-grow: 1;
+    display: flex;
+    gap: 16px;
+    padding: 24px;
+    overflow-x: auto;
+    align-items: flex-start;
+}
+
+.list {
+    flex: 0 0 300px;
+    background-color: var(--surface-2);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 120px);
+    transition: background-color var(--transition-normal);
+    animation: var(--animation-card-drop);
+    box-shadow: var(--shadow-elevation-low);
+}
+
+.list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 8px 8px 16px;
+    flex-shrink: 0;
+    cursor: grab;
+    border-bottom: 1px solid var(--border-color-soft);
+}
+
+.list-header:active {
+    cursor: grabbing;
+}
+
+.list-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.list-title-text {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-primary);
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.list-title-input {
+    font-weight: 600;
+    padding: 4px;
+    background: var(--surface-1);
+    border: none;
+    color: var(--text-primary);
+    font-size: 1rem;
+    width: 100%;
+    border-radius: var(--radius-sm);
+    outline: none;
+    box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.card-count {
+    font-size: 0.85rem;
+    color: var(--text-tertiary);
+    background-color: var(--border-color-soft);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.list-actions {
+    display: flex;
+    align-items: center;
+}
+
+.cards-container {
+    flex-grow: 1;
+    padding: 8px;
+    overflow-y: auto;
+    min-height: 20px;
+}
+
+.list-footer {
+    padding: 8px;
+    flex-shrink: 0;
+    border-top: 1px solid var(--border-color-soft);
+}
+
+.add-card-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.add-card-textarea {
+    width: 100%;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color-medium);
+    font-family: var(--font-family);
+    font-size: 0.9rem;
+    background-color: var(--surface-1);
+    color: var(--text-primary);
+    resize: vertical;
+    min-height: 60px;
+    padding: 8px 12px;
+}
+
+.add-card-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card {
+    position: relative;
+    background-color: var(--surface-1);
+    margin-bottom: 8px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-normal), border-color var(--transition-fast);
+    display: flex;
+    border: 1px solid var(--border-color-soft);
+    animation: var(--animation-card-drop);
+    box-shadow: var(--shadow-elevation-low);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-color-medium);
+    box-shadow: var(--shadow-elevation-medium);
+}
+
+.card-label-strip {
+    flex-shrink: 0;
+    width: 6px;
+    background-color: transparent;
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+    transition: background-color var(--transition-normal);
+}
+
+.card-content {
+    padding: 12px;
+    width: 100%;
+    min-width: 0;
+}
+
+.card-title-text {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.card.sortable-ghost {
+    background-color: var(--primary-color-background);
+    border: 1px dashed var(--primary-color);
+    box-shadow: none;
+    color: transparent;
+}
+
+.card.sortable-ghost * {
+    visibility: hidden;
+}
+
+/* Nút "X" để hủy thêm thẻ kế thừa từ class .icon-btn */
+.add-card-cancel-btn {
+    /* Kế thừa từ .icon-btn hoặc có style tương tự */
+    width: 36px;
+    height: 36px;
+    font-size: 1.5rem;
+    line-height: 1;
+
+    /* Các thuộc tính quan trọng để làm đẹp */
+    flex-shrink: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-tertiary);
+    /* Màu chữ xám nhạt */
+    padding: var(--space-xs);
+    border-radius: 50%;
+    /* << Biến nó thành hình tròn */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color var(--transition-fast), background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.add-card-cancel-btn:hover:not(:disabled) {
+    background-color: var(--primary-color-background-hover);
+    /* Hiệu ứng khi di chuột */
+    color: var(--primary-color);
+}
+
+.add-card-cancel-btn:active:not(:disabled) {
+    transform: scale(0.9);
+    /* Hiệu ứng khi nhấn */
+}
+
+
+/* ==========================================================================
+   10. BUTTONS & FORMS
+   ========================================================================== */
+
+/* Generic Button & Input styles */
+input[type="text"],
+input[type="color"],
+select,
+textarea {
+    font-family: var(--font-family);
+    font-size: 0.9rem;
+    background-color: var(--surface-1);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color-medium);
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-normal);
+    width: 100%;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-color-background);
+    outline: none;
+}
+
+input[type="color"] {
+    padding: 4px;
+    height: 40px;
+    min-width: 60px;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    background: var(--border-color-soft);
+    border-radius: var(--radius-full);
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--primary-color);
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid var(--surface-1);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: var(--primary-color);
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid var(--surface-1);
+}
+
+
+/* Primary Button */
+.primary-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    background-color: var(--primary-color);
+    color: var(--text-on-primary);
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.primary-btn:hover {
+    background-color: var(--primary-color-light);
+}
+
+.primary-btn:active {
+    transform: scale(0.98);
+}
+
+.primary-btn:disabled {
+    background-color: var(--border-color-medium);
+    color: var(--text-tertiary);
+    cursor: not-allowed;
+}
+
+/* Danger Button */
+.danger-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--danger-color);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    background-color: transparent;
+    color: var(--danger-color);
+    transition: background-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+}
+
+.danger-btn:hover {
+    background-color: var(--danger-color);
+    color: var(--text-on-primary);
+}
+
+.danger-btn:active {
+    transform: scale(0.98);
+}
+
+/* Header/Secondary Button */
+.header-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background-color: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color-medium);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all var(--transition-fast);
+}
+
+.header-btn:hover {
+    border-color: var(--primary-color);
+    background-color: var(--primary-color-background);
+    color: var(--primary-color);
+}
+
+.header-btn.icon-btn {
+    padding: 8px;
+}
+
+/* Action Buttons (in cards, lists) */
+.card-action-btn,
+.list-action-btn,
+.modal-close-btn {
+    flex-shrink: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-tertiary);
+    padding: 4px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: color var(--transition-fast), background-color var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-action-btn:hover,
+.list-action-btn:hover,
+.modal-close-btn:hover {
+    background-color: var(--primary-color-background-hover);
+    color: var(--primary-color);
+}
+
+.card-action-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    background-color: var(--surface-2);
+    border: 1px solid var(--border-color-soft);
+    border-radius: var(--radius-sm);
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.9);
+    transition: opacity var(--transition-fast), transform var(--transition-fast), background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.card:hover .card-action-btn {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+}
+
+/* Add Card Button */
+.add-card-btn {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background-color: transparent;
+    color: var(--text-secondary);
+    border-radius: var(--radius-md);
+    text-align: left;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.add-card-btn:hover {
+    background-color: var(--primary-color-background-hover);
+    color: var(--primary-color);
+}
+
+/* ==========================================================================
+   11. MODALS
+   ========================================================================== */
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: hsla(220, 13%, 10%, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: fadeIn var(--transition-normal);
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.modal-content {
+    background: var(--surface-modal);
+    border: 1px solid var(--border-color-soft);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 550px;
+    box-shadow: var(--shadow-elevation-medium);
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    animation: slideInUp var(--transition-normal);
+}
+
+.modal-content.modal-lg {
+    max-width: 900px;
+}
+
+.modal-content.modal-viewer {
+    max-width: 90vw;
+    max-height: 90vh;
+    background: var(--surface-3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border-color-soft);
+    flex-shrink: 0;
+}
+
+.modal-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.modal-close-btn {
+    font-size: 1.5rem;
+}
+
+.modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-color-soft);
+    background-color: var(--surface-2);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   12. SETTINGS MODAL
+   ========================================================================== */
+
+.settings-section {
+    margin-bottom: 16px;
+}
+
+.settings-section h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color-soft);
+    color: var(--text-primary);
+}
+
+.control-group {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.control-group label {
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    justify-self: start;
+}
+
+.labels-list-editor {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.labels-list-editor li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    background-color: var(--surface-1);
+    border: 1px solid var(--border-color-soft);
+}
+
+.label-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+}
+
+.label-color-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--surface-2);
+}
+
+.label-delete-btn {
+    border: none;
+    background: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    font-size: 1.2rem;
+    opacity: 0;
+    transition: opacity var(--transition-fast), color var(--transition-fast);
+}
+
+.labels-list-editor li:hover .label-delete-btn {
+    opacity: 1;
+}
+
+.label-delete-btn:hover {
+    color: var(--danger-color);
+}
+
+.add-label-form {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 8px;
+}
+
+.settings-description {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+
+/* ==========================================================================
+   13. CARD DETAIL MODAL
+   ========================================================================== */
+
+#card-detail-modal .modal-body {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr);
+    gap: 32px;
+    padding: 24px;
+}
+
+@media (max-width: 768px) {
+    #card-detail-modal .modal-body {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card-detail-section-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Sidebar Sections */
+#card-detail-labels-container .label-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+    border: 1px solid var(--border-color-soft);
+}
+
+#card-detail-labels-container .label-item:hover {
+    transform: translateY(-1px);
+}
+
+#card-detail-labels-container .label-item.selected {
+    box-shadow: 0 0 0 2px var(--primary-color-border);
+    border-color: transparent;
+}
+
+.metadata-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 12px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.metadata-grid dt {
+    font-weight: 500;
+    color: var(--text-tertiary);
+}
+
+/* ==========================================================================
+   14. QUILL EDITOR STYLING
+   ========================================================================== */
+
+#quill-toolbar {
+    border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
+    background: var(--surface-1) !important;
+    border: 1px solid var(--border-color-medium) !important;
+    border-bottom: none !important;
+    padding: 12px !important;
+    transition: background-color var(--transition-normal), border-color var(--transition-normal);
+}
+
+.ql-toolbar.ql-snow .ql-formats {
+    margin-right: 15px !important;
+}
+
+.ql-snow.ql-toolbar button,
+.ql-snow .ql-toolbar button {
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.ql-snow.ql-toolbar button:hover,
+.ql-snow .ql-toolbar button:hover,
+.ql-snow.ql-toolbar button:focus,
+.ql-snow .ql-toolbar button:focus,
+.ql-snow.ql-toolbar button.ql-active,
+.ql-snow .ql-toolbar button.ql-active,
+.ql-snow.ql-toolbar .ql-picker-label:hover,
+.ql-snow .ql-toolbar .ql-picker-label:hover,
+.ql-snow.ql-toolbar .ql-picker-label.ql-active,
+.ql-snow .ql-toolbar .ql-picker-label.ql-active,
+.ql-snow.ql-toolbar .ql-picker-item:hover,
+.ql-snow .ql-toolbar .ql-picker-item:hover,
+.ql-snow.ql-toolbar .ql-picker-item.ql-selected,
+.ql-snow .ql-toolbar .ql-picker-item.ql-selected {
+    color: var(--primary-color) !important;
+}
+
+.ql-snow.ql-toolbar button:hover .ql-stroke,
+.ql-snow .ql-toolbar button:hover .ql-stroke,
+.ql-snow.ql-toolbar button:focus .ql-stroke,
+.ql-snow .ql-toolbar button:focus .ql-stroke,
+.ql-snow.ql-toolbar button.ql-active .ql-stroke,
+.ql-snow .ql-toolbar button.ql-active .ql-stroke,
+.ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke,
+.ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke,
+.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke,
+.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke,
+.ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke,
+.ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke,
+.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke,
+.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke {
+    stroke: var(--primary-color) !important;
+}
+
+
+#quill-uppercase-btn,
+#quill-lowercase-btn {
+    font-weight: bold;
+    font-family: monospace;
+}
+
+#quill-attach-file-btn {
+    vertical-align: middle;
+}
+
+#quill-attach-file-btn svg {
+    vertical-align: text-bottom;
+}
+
+.ql-container.ql-snow {
+    border-radius: 0 0 var(--radius-md) var(--radius-md) !important;
+    border: 1px solid var(--border-color-medium) !important;
+    border-top: none !important;
+    background: var(--surface-1);
+    transition: background-color var(--transition-normal), border-color var(--transition-normal);
+}
+
+.ql-editor {
+    min-height: 150px;
+    max-height: 40vh;
+    resize: vertical;
+    color: var(--text-primary) !important;
+    transition: all var(--transition-fast);
+}
+
+.ql-editor.ql-blank::before {
+    color: var(--text-tertiary) !important;
+    font-style: normal !important;
+}
+
+.ql-editor.drop-target {
+    outline: 2px dashed var(--primary-color);
+    background: var(--primary-color-background);
+}
+
+.ql-editor a {
+    color: var(--text-link);
+}
+
+.file-attachment {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--surface-2);
+    border: 1px solid var(--border-color-soft);
+    border-radius: var(--radius-full);
+    padding: 4px 12px;
+    margin: 2px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    user-select: none;
+}
+
+.file-attachment:hover {
+    border-color: var(--primary-color);
+    background-color: var(--primary-color-background-hover);
+    color: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+.file-attachment svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.file-attachment-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+/* ==========================================================================
+   15. ATTACHMENTS GALLERY
+   ========================================================================== */
+
+.attachments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+}
+
+.gallery-item {
+    position: relative;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+    aspect-ratio: 1 / 1;
+    background-color: var(--surface-1);
+    border: 1px solid var(--border-color-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.gallery-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-elevation-low);
+    transform: translateY(-2px);
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+}
+
+.gallery-item:hover img {
+    transform: scale(1.05);
+}
+
+.gallery-item .gallery-error {
+    font-size: 2rem;
+    color: var(--danger-color);
+}
+
+.gallery-item.file-type-item {
+    flex-direction: column;
+    padding: 8px;
+    text-align: center;
+}
+
+.gallery-item .file-icon svg {
+    width: 36px;
+    height: 36px;
+    color: var(--text-tertiary);
+    margin-bottom: 8px;
+}
+
+.gallery-item .file-name {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    word-break: break-all;
+    max-height: 3em;
+    overflow: hidden;
+    line-height: 1em;
+}
+
+.gallery-item-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 50%);
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 6px;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.gallery-item:hover .gallery-item-overlay {
+    opacity: 1;
+}
+
+.gallery-item.uploading .gallery-item-overlay {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.7);
+    align-items: center;
+    justify-content: center;
+}
+
+.gallery-delete-btn {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    color: var(--danger-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: bold;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transform: scale(0.9);
+    opacity: 0;
+    transition: all var(--transition-fast);
+}
+
+.gallery-item:hover .gallery-delete-btn {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.gallery-delete-btn:hover {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.attachment-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background-color: var(--primary-color);
+    transition: width 0.1s linear;
+}
+
+.gallery-item-upload-placeholder {
+    flex-direction: column;
+    gap: 8px;
+    border: 2px dashed var(--border-color-medium);
+    background-color: var(--surface-2);
+    color: var(--text-tertiary);
+    transition: all var(--transition-fast);
+}
+
+.gallery-item-upload-placeholder:hover {
+    border-color: var(--primary-color);
+    background-color: var(--primary-color-background);
+    color: var(--primary-color);
+}
+
+.gallery-item-upload-placeholder svg {
+    width: 24px;
+    height: 24px;
+    transition: transform var(--transition-fast);
+}
+
+.gallery-item-upload-placeholder:hover svg {
+    transform: scale(1.1);
+}
+
+.gallery-item-upload-placeholder span {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   16. PREVIEW MODAL (LIGHTBOX)
+   ========================================================================== */
+
+.media-viewer-body {
+    flex-grow: 1;
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    /* Hide overflow to contain the image/video */
+}
+
+.media-viewer-body img,
+.media-viewer-body video {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-elevation-medium);
+}
+
+.media-viewer-body audio {
+    width: 80%;
+    max-width: 600px;
+}
+
+.media-viewer-body pre {
+    background: var(--surface-1);
+    padding: 16px;
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    max-height: 100%;
+    overflow: auto;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.preview-unsupported {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 24px;
+    background-color: var(--surface-1);
+    border-radius: var(--radius-lg);
+}
+
+.preview-unsupported p {
+    margin-bottom: 16px;
+}
+
+#preview-modal .modal-header {
+    background: transparent;
+    border-bottom: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), transparent);
+}
+
+#preview-modal .modal-header h2 {
+    color: white;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+#preview-modal .modal-close-btn {
+    color: white;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+#preview-modal .modal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+#preview-modal .modal-footer {
+    background: transparent;
+    border-top: none;
+    justify-content: center;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.3), transparent);
+    padding: 24px;
+}
+
+/* ==========================================================================
+   17. CONTEXT MENUS
+   ========================================================================== */
+
+.context-menu {
+    position: fixed;
+    z-index: 1001;
+    background-color: var(--surface-modal);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-elevation-medium);
+    border: 1px solid var(--border-color-soft);
+    padding: 8px;
+    animation: fadeIn 100ms ease, slideInUp 150ms ease;
+    min-width: 220px;
+}
+
+.context-menu ul {
+    list-style: none;
+}
+
+.context-menu li {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.context-menu li.active {
+    background-color: var(--primary-color-background);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.context-menu li:not(.active):hover {
+    background-color: var(--primary-color-background-hover);
+    color: var(--primary-color);
+}
+
+.context-menu li.danger:not(.active):hover {
+    background-color: var(--danger-background);
+    color: var(--danger-color);
+}
+
+.dark-theme .context-menu li.danger:not(.active):hover {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+/* Thêm vào cuối file style.css */
+#wallpaper-info {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    z-index: 0;
+    /* Đặt dưới các nội dung chính */
+    padding: 5px 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 12px;
+    border-radius: 4px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Hiển thị khi có nội dung */
+#wallpaper-info:not(:empty) {
+    opacity: 1;
+}
+
+/* ==========================================================================
+   18. WALLPAPER GALLERY MODAL (SỬA LỖI)
+   ========================================================================== */
+.modal-content.modal-xl {
+    max-width: 90vw;
+    width: 1200px;
+    max-height: 85vh;
+    /* FIX: Biến modal-content thành flex container để quản lý layout con tốt hơn */
+    display: flex;
+    flex-direction: column;
+}
+
+#wallpaper-gallery-modal .modal-body {
+    padding: 16px;
+    background-color: var(--surface-3);
+    /* FIX: Cho phép modal-body co giãn để lấp đầy không gian còn lại */
+    flex-grow: 1;
+    /* FIX: Quan trọng - Thêm overflow: auto để chính modal-body có thể cuộn được */
+    overflow-y: auto;
+}
+
+/* FIX: Gỡ bỏ height và overflow, để nó tự dãn theo số lượng item */
+.wallpaper-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    padding: 8px;
+}
+
+.wallpaper-item {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+    background-color: var(--surface-2);
+    border: 3px solid transparent;
+    transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.wallpaper-item:hover,
+.wallpaper-item:focus-visible {
+    transform: scale(1.03);
+    border-color: var(--primary-color-light);
+}
+
+.wallpaper-item.selected {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 15px var(--primary-color-background);
+}
+
+.wallpaper-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+}
+
+.wallpaper-item:hover .wallpaper-thumbnail {
+    transform: scale(1.1);
+}
+
+.wallpaper-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 60%);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.wallpaper-title {
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.3;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.wallpaper-selected-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: scale(0);
+    opacity: 0;
+    transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.wallpaper-item.selected .wallpaper-selected-indicator {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* FIX: Đặt loader ở cuối grid, nó sẽ hiện ra khi cuộn xuống */
+.wallpaper-loader {
+    padding: 24px;
+    display: flex;
+    justify-content: center;
+    /* Thêm grid-column để nó chiếm toàn bộ chiều rộng của grid */
+    grid-column: 1 / -1;
+}
+
+.wallpaper-loader .spinner-small {
+    width: 32px;
+    height: 32px;
+}
