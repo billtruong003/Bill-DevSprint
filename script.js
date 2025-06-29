@@ -95,8 +95,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const wallpaperGrid = document.getElementById('wallpaper-grid');
     const wallpaperLoader = document.getElementById('wallpaper-loader');
     const wallpaperItemTemplate = document.getElementById('wallpaper-item-template');
+
+    const globalSearchInput = document.getElementById('global-search-input');
+    const storageBtn = document.getElementById('storage-btn');
+    const storageModal = document.getElementById('storage-modal');
+    const storageGrid = document.getElementById('storage-grid');
+    const storageEmptyPlaceholder = document.getElementById('storage-empty-placeholder');
+    const storageItemTemplate = document.getElementById('storage-item-template');
+
+
     // #endregion
 
+    // #region Variables 
     let metaState = {};
     let state = {};
 
@@ -110,6 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const WALLPAPERS_PER_PAGE = 20;
     let wallpapersLoaded = 0;
     let wallpaperObserver = null;
+
+    let wallpaperSearchInput;
+    let filteredWallpapers = [];
     // #endregion
 
     // #region UI HELPERS
@@ -675,6 +688,56 @@ document.addEventListener('DOMContentLoaded', () => {
             boardContainer.replaceChild(newListEl, oldListEl);
         }
     }
+
+    function handleGlobalSearch() {
+        const searchTerm = normalizeVietnamese(globalSearchInput.value.toLowerCase().trim());
+        const allLists = boardContainer.querySelectorAll('.list');
+
+        if (!searchTerm) {
+            // Nếu không có từ khóa, hiện tất cả
+            allLists.forEach(listEl => {
+                listEl.classList.remove('hidden');
+                listEl.querySelectorAll('.card').forEach(cardEl => cardEl.classList.remove('hidden'));
+            });
+            return;
+        }
+
+        allLists.forEach(listEl => {
+            const listId = listEl.dataset.listId;
+            const listData = state.lists.find(l => l.id === listId);
+            let listHasVisibleCards = false;
+
+            // Tìm kiếm trong các thẻ của cột này
+            const allCards = listEl.querySelectorAll('.card');
+            allCards.forEach(cardEl => {
+                const cardId = cardEl.dataset.cardId;
+                const cardData = listData.cards.find(c => c.id === cardId);
+
+                // Lấy text từ description để tìm kiếm
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = cardData.description || '';
+                const descriptionText = tempDiv.textContent || tempDiv.innerText || '';
+
+                const cardTitle = normalizeVietnamese(cardData.title.toLowerCase());
+                const cardDesc = normalizeVietnamese(descriptionText.toLowerCase());
+
+                if (cardTitle.includes(searchTerm) || cardDesc.includes(searchTerm)) {
+                    cardEl.classList.remove('hidden');
+                    listHasVisibleCards = true;
+                } else {
+                    cardEl.classList.add('hidden');
+                }
+            });
+
+            // Kiểm tra xem tiêu đề cột có khớp không
+            const listTitle = normalizeVietnamese(listData.title.toLowerCase());
+            if (listTitle.includes(searchTerm) || listHasVisibleCards) {
+                listEl.classList.remove('hidden');
+            } else {
+                listEl.classList.add('hidden');
+            }
+        });
+    }
     // #endregion
 
     // #region CORE LOGIC (LISTS & CARDS)
@@ -1219,6 +1282,9 @@ document.addEventListener('DOMContentLoaded', () => {
             closePreviewModal();
         }
         if (modal === wallpaperGalleryModal) {
+            if (wallpaperSearchInput) {
+                wallpaperSearchInput.removeEventListener('input', handleWallpaperSearch);
+            }
             if (wallpaperObserver) {
                 wallpaperObserver.disconnect();
                 wallpaperObserver = null;
@@ -1448,6 +1514,26 @@ document.addEventListener('DOMContentLoaded', () => {
         return null;
     }
 
+    const handleWallpaperSearch = debounce(() => {
+        const searchTerm = normalizeVietnamese(wallpaperSearchInput.value.toLowerCase().trim());
+
+        if (searchTerm) {
+            filteredWallpapers = allWallpapers.filter(w =>
+                normalizeVietnamese(w.title.toLowerCase()).includes(searchTerm)
+            );
+        } else {
+            filteredWallpapers = [...allWallpapers];
+        }
+
+        // Reset và render lại từ đầu
+        wallpaperGrid.innerHTML = '';
+        wallpapersLoaded = 0;
+        wallpaperLoader.style.display = 'flex';
+        if (wallpaperObserver) wallpaperObserver.observe(wallpaperLoader); // Đảm bảo observer vẫn chạy
+        renderMoreWallpapers();
+
+    }, 300);
+
     function showAddCardForm(listEl) {
         listEl.querySelector('.add-card-btn').style.display = 'none';
         const formContainer = listEl.querySelector('.add-card-form-container');
@@ -1553,6 +1639,40 @@ document.addEventListener('DOMContentLoaded', () => {
         wallpapersLoaded += wallpapersToRender.length;
     }
 
+    function renderMoreWallpapers() {
+        // Thay allWallpapers bằng filteredWallpapers
+        const wallpapersToRender = filteredWallpapers.slice(wallpapersLoaded, wallpapersLoaded + WALLPAPERS_PER_PAGE);
+
+        if (wallpapersToRender.length === 0 && wallpapersLoaded === 0) {
+            // Thêm thông báo không tìm thấy kết quả
+            wallpaperGrid.innerHTML = `<p class="wallpaper-no-results">Không tìm thấy hình nền nào khớp.</p>`;
+        }
+
+        if (wallpapersToRender.length === 0) {
+            wallpaperLoader.style.display = 'none';
+            if (wallpaperObserver) wallpaperObserver.disconnect();
+            return;
+        }
+
+        wallpapersToRender.forEach(wallpaperData => {
+            const item = wallpaperItemTemplate.content.cloneNode(true).firstElementChild;
+            const url = wallpaperData.media.webm || wallpaperData.media.mp4;
+
+            item.querySelector('.wallpaper-thumbnail').src = wallpaperData.thumbnailUrl;
+            item.querySelector('.wallpaper-title').textContent = wallpaperData.title;
+            item.dataset.wallpaperUrl = url;
+            item.dataset.wallpaperData = JSON.stringify(wallpaperData);
+
+            if (bgImageInput.value === url) {
+                item.classList.add('selected');
+            }
+
+            item.addEventListener('click', handleWallpaperSelect);
+            wallpaperGrid.appendChild(item);
+        });
+
+        wallpapersLoaded += wallpapersToRender.length;
+    }
 
     function handleWallpaperSelect(e) {
         const selectedItem = e.currentTarget;
@@ -1572,13 +1692,23 @@ document.addEventListener('DOMContentLoaded', () => {
         wallpaperGalleryModal.classList.remove('hidden');
         await fetchWallpapersIfNeeded();
 
+        // Gán selector ở đây vì element chỉ tồn tại khi modal mở
+        wallpaperSearchInput = document.getElementById('wallpaper-search-input');
+        wallpaperSearchInput.value = ''; // Xóa tìm kiếm cũ
+
+        // Bắt đầu với danh sách đầy đủ
+        filteredWallpapers = [...allWallpapers];
+
         wallpaperGrid.innerHTML = '';
         wallpapersLoaded = 0;
         wallpaperLoader.style.display = 'flex';
-        renderMoreWallpapers();
+        renderMoreWallpapers(); // Render lần đầu
+
+        // Gắn listener tìm kiếm
+        wallpaperSearchInput.addEventListener('input', handleWallpaperSearch);
+
 
         if (wallpaperObserver) wallpaperObserver.disconnect();
-
         wallpaperObserver = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting) {
                 renderMoreWallpapers();
@@ -1588,6 +1718,73 @@ document.addEventListener('DOMContentLoaded', () => {
         if (wallpaperLoader) {
             wallpaperObserver.observe(wallpaperLoader);
         }
+    }
+    // #endregion
+
+    //#region STORAGE MANAGER
+    function getAllBoardAttachments() {
+        const allAttachments = [];
+        state.lists.forEach(list => {
+            (list.cards || []).forEach(card => {
+                (card.attachments || []).forEach(attachment => {
+                    allAttachments.push({
+                        ...attachment,
+                        cardId: card.id,
+                        cardTitle: card.title,
+                        listId: list.id
+                    });
+                });
+            });
+        });
+        return allAttachments;
+    }
+
+    function renderStorageModal() {
+        storageGrid.innerHTML = '';
+        const allAttachments = getAllBoardAttachments();
+
+        storageEmptyPlaceholder.classList.toggle('hidden', allAttachments.length > 0);
+
+        allAttachments.forEach(attachment => {
+            const itemEl = storageItemTemplate.content.cloneNode(true).firstElementChild;
+            const thumbnailContainer = itemEl.querySelector('.storage-item-thumbnail');
+            const nameEl = itemEl.querySelector('.storage-item-name');
+            const cardLinkEl = itemEl.querySelector('.storage-item-card-link');
+            const deleteBtn = itemEl.querySelector('.storage-item-delete-btn');
+
+            thumbnailContainer.innerHTML = getFileIconSVG(attachment.type);
+            nameEl.textContent = attachment.name;
+            nameEl.title = attachment.name;
+            cardLinkEl.textContent = attachment.cardTitle;
+
+            cardLinkEl.addEventListener('click', (e) => {
+                e.preventDefault();
+                closeModal(storageModal);
+                openCardDetailModal(attachment.cardId, attachment.listId);
+            });
+
+            deleteBtn.addEventListener('click', async () => {
+                if (confirm(`Bạn có chắc chắn muốn xóa vĩnh viễn tệp "${attachment.name}" không? Hành động này không thể hoàn tác.`)) {
+                    // Xóa file trên Drive
+                    await driveHelper.deleteFile(attachment.id);
+
+                    // Cập nhật state
+                    const list = state.lists.find(l => l.id === attachment.listId);
+                    const card = list.cards.find(c => c.id === attachment.cardId);
+                    card.attachments = card.attachments.filter(att => att.id !== attachment.id);
+
+                    saveBoardState();
+                    renderStorageModal(); // Render lại modal
+                }
+            });
+
+            storageGrid.appendChild(itemEl);
+        });
+    }
+
+    function openStorageModal() {
+        renderStorageModal();
+        storageModal.classList.remove('hidden');
     }
     // #endregion
 
@@ -1683,7 +1880,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-
+        globalSearchInput.addEventListener('input', debounce(handleGlobalSearch, 300));
+        storageBtn.addEventListener('click', openStorageModal);
         document.addEventListener('click', () => boardSwitcher.classList.remove('open'));
     }
 
