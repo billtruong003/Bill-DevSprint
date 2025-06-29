@@ -928,20 +928,29 @@ document.addEventListener('DOMContentLoaded', () => {
         hideContextMenus();
     });
     listContextMenu.addEventListener('click', e => {
-        const action = e.target.dataset.action;
-        if (!action || !activeListMenu) return;
+        const actionTarget = e.target.closest('li[data-action]');
+        if (!actionTarget || !activeListMenu) return;
+
+        const action = actionTarget.dataset.action;
         const { listId } = activeListMenu;
-        if (action.startsWith('sort-')) sortList(listId, action.replace('sort-', ''));
-        else if (action === 'delete-all-cards') {
+
+        if (action.startsWith('sort-')) {
+            sortList(listId, action.replace('sort-', ''));
+        } else if (action === 'delete-all-cards') {
             const list = state.lists.find(l => l.id === listId);
-            if (confirm(`Bạn chắc chắn muốn xóa vĩnh viễn tất cả ${list.cards.length} thẻ trong cột "${list.title}"?`)) {
+            if (list && confirm(`Bạn chắc chắn muốn xóa vĩnh viễn tất cả ${list.cards.length} thẻ trong cột "${list.title}"?`)) {
                 const filesToDelete = (list.cards || []).flatMap(card => (card.attachments || []).map(att => att.id));
                 const deletePromises = filesToDelete.map(fileId => driveHelper.deleteFile(fileId));
                 Promise.all(deletePromises).then(() => {
-                    list.cards = []; saveBoardState(); reRenderList(listId);
+                    list.cards = [];
+                    saveBoardState();
+                    reRenderList(listId);
                 });
             }
+        } else if (action === 'delete-list') {
+            deleteList(listId);
         }
+
         hideContextMenus();
     });
     function sortList(listId, criteria) {
