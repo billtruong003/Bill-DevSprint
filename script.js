@@ -449,6 +449,16 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     };
 
+    const debounceUI = (func, delay) => {
+        let timeout;
+        return function (...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                func.apply(this, args);
+            }, delay);
+        };
+    };
+
     const saveBoardState = debounce(() => {
         const boardInfo = metaState.boards.find(b => b.id === state.id);
         if (boardInfo) {
@@ -691,43 +701,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleGlobalSearch() {
         const searchTerm = normalizeVietnamese(globalSearchInput.value.toLowerCase().trim());
-        const allLists = boardContainer.querySelectorAll('.list');
+        const allListElements = boardContainer.querySelectorAll('.list');
 
+        // Nếu không có từ khóa, hiện tất cả và thoát
         if (!searchTerm) {
-            // Nếu không có từ khóa, hiện tất cả
-            allLists.forEach(listEl => {
+            allListElements.forEach(listEl => {
                 listEl.classList.remove('hidden');
-                listEl.querySelectorAll('.card').forEach(cardEl => cardEl.classList.remove('hidden'));
+                const cards = listEl.querySelectorAll('.card');
+                if (cards) cards.forEach(cardEl => cardEl.classList.remove('hidden'));
             });
+            document.body.classList.remove('is-searching');
             return;
         }
 
-        allLists.forEach(listEl => {
+        document.body.classList.add('is-searching');
+
+        allListElements.forEach(listEl => {
             const listId = listEl.dataset.listId;
             const listData = state.lists.find(l => l.id === listId);
+            if (!listData) return; // Bỏ qua nếu không tìm thấy dữ liệu
+
             let listHasVisibleCards = false;
 
             // Tìm kiếm trong các thẻ của cột này
-            const allCards = listEl.querySelectorAll('.card');
-            allCards.forEach(cardEl => {
-                const cardId = cardEl.dataset.cardId;
-                const cardData = listData.cards.find(c => c.id === cardId);
+            const allCardElements = listEl.querySelectorAll('.card');
+            if (allCardElements.length > 0) {
+                allCardElements.forEach(cardEl => {
+                    const cardId = cardEl.dataset.cardId;
+                    // Dùng (listData.cards || []) để tránh lỗi khi list không có thẻ
+                    const cardData = (listData.cards || []).find(c => c.id === cardId);
 
-                // Lấy text từ description để tìm kiếm
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = cardData.description || '';
-                const descriptionText = tempDiv.textContent || tempDiv.innerText || '';
+                    // Nếu không tìm thấy card data (trường hợp hiếm), ẩn nó đi
+                    if (!cardData) {
+                        cardEl.classList.add('hidden');
+                        return;
+                    }
 
-                const cardTitle = normalizeVietnamese(cardData.title.toLowerCase());
-                const cardDesc = normalizeVietnamese(descriptionText.toLowerCase());
+                    // Lấy text từ description để tìm kiếm
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = cardData.description || '';
+                    const descriptionText = tempDiv.textContent || '';
 
-                if (cardTitle.includes(searchTerm) || cardDesc.includes(searchTerm)) {
-                    cardEl.classList.remove('hidden');
-                    listHasVisibleCards = true;
-                } else {
-                    cardEl.classList.add('hidden');
-                }
-            });
+                    const cardTitle = normalizeVietnamese(cardData.title.toLowerCase());
+                    const cardDesc = normalizeVietnamese(descriptionText.toLowerCase());
+
+                    if (cardTitle.includes(searchTerm) || cardDesc.includes(searchTerm)) {
+                        cardEl.classList.remove('hidden');
+                        listHasVisibleCards = true;
+                    } else {
+                        cardEl.classList.add('hidden');
+                    }
+                });
+            }
 
             // Kiểm tra xem tiêu đề cột có khớp không
             const listTitle = normalizeVietnamese(listData.title.toLowerCase());
@@ -1610,38 +1635,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderMoreWallpapers() {
-        const wallpapersToRender = allWallpapers.slice(wallpapersLoaded, wallpapersLoaded + WALLPAPERS_PER_PAGE);
-
-        if (wallpapersToRender.length === 0) {
-            wallpaperLoader.style.display = 'none';
-            if (wallpaperObserver) wallpaperObserver.disconnect();
-            return;
-        }
-
-        wallpapersToRender.forEach(wallpaperData => {
-            const item = wallpaperItemTemplate.content.cloneNode(true).firstElementChild;
-            const url = wallpaperData.media.webm || wallpaperData.media.mp4;
-
-            item.querySelector('.wallpaper-thumbnail').src = wallpaperData.thumbnailUrl;
-            item.querySelector('.wallpaper-title').textContent = wallpaperData.title;
-            item.dataset.wallpaperUrl = url; // Lưu URL chính để so sánh
-            item.dataset.wallpaperData = JSON.stringify(wallpaperData);
-
-            // So sánh với URL đã lưu trong state
-            if (bgImageInput.value === url) {
-                item.classList.add('selected');
-            }
-
-            item.addEventListener('click', handleWallpaperSelect);
-            wallpaperGrid.appendChild(item);
-        });
-
-        wallpapersLoaded += wallpapersToRender.length;
-    }
-
-    function renderMoreWallpapers() {
         // Thay allWallpapers bằng filteredWallpapers
         const wallpapersToRender = filteredWallpapers.slice(wallpapersLoaded, wallpapersLoaded + WALLPAPERS_PER_PAGE);
+
+        // Xóa thông báo "Không tìm thấy" cũ nếu có
+        const noResultsEl = wallpaperGrid.querySelector('.wallpaper-no-results');
+        if (noResultsEl) noResultsEl.remove();
 
         if (wallpapersToRender.length === 0 && wallpapersLoaded === 0) {
             // Thêm thông báo không tìm thấy kết quả
@@ -1880,7 +1879,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-        globalSearchInput.addEventListener('input', debounce(handleGlobalSearch, 300));
+        globalSearchInput.addEventListener('input', debounceUI(handleGlobalSearch, 300)); // SỬA THÀNH debounceUI
         storageBtn.addEventListener('click', openStorageModal);
         document.addEventListener('click', () => boardSwitcher.classList.remove('open'));
     }
