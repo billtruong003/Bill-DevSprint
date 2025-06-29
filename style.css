@@ -1746,6 +1746,43 @@ input[type="range"]::-moz-range-thumb {
     opacity: 1;
 }
 
+#wallpaper-gallery-modal .modal-header {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+}
+
+#wallpaper-gallery-title {
+    justify-self: start;
+}
+
+.modal-close-btn {
+    justify-self: end;
+}
+
+.wallpaper-search-container {
+    justify-self: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+.wallpaper-search-input {
+    width: 100%;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    background-color: var(--surface-1);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color-medium);
+    border-radius: var(--radius-full);
+}
+
+.wallpaper-no-results {
+    grid-column: 1 / -1;
+    /* Chiếm toàn bộ chiều rộng grid */
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+}
 /* FIX: Đặt loader ở cuối grid, nó sẽ hiện ra khi cuộn xuống */
 .wallpaper-loader {
     padding: 24px;
@@ -1758,4 +1795,134 @@ input[type="range"]::-moz-range-thumb {
 .wallpaper-loader .spinner-small {
     width: 32px;
     height: 32px;
+}
+/* Đặt trong phần BUTTONS & FORMS hoặc CORE APP LAYOUT */
+
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--text-tertiary);
+    pointer-events: none;
+    /* Để có thể click xuyên qua icon */
+}
+
+.global-search-input {
+    background-color: var(--surface-1);
+    border: 1px solid var(--border-color-medium);
+    border-radius: var(--radius-md);
+    padding: 8px 16px 8px 40px;
+    /* Thêm padding trái cho icon */
+    width: 250px;
+    transition: all var(--transition-fast);
+}
+
+.global-search-input:focus {
+    border-color: var(--primary-color);
+    background-color: var(--surface-1);
+    box-shadow: 0 0 0 2px var(--primary-color-background);
+    width: 350px;
+    /* Mở rộng khi focus */
+}
+
+/* Cho phép xóa nhanh nội dung trong input type="search" */
+.global-search-input::-webkit-search-cancel-button {
+    cursor: pointer;
+}
+
+/* Đặt ở cuối file CSS */
+#storage-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#storage-empty-placeholder {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+    border: 2px dashed var(--border-color-medium);
+    border-radius: var(--radius-lg);
+}
+
+.storage-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background-color: var(--surface-1);
+    padding: 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color-soft);
+}
+
+.storage-item-thumbnail {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    background-color: var(--surface-2);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.storage-item-thumbnail svg {
+    width: 28px;
+    height: 28px;
+    color: var(--text-secondary);
+}
+
+.storage-item-info {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.storage-item-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.storage-item-context {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.storage-item-card-link {
+    color: var(--text-link);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.storage-item-card-link:hover {
+    text-decoration: underline;
+}
+
+.danger-btn-icon {
+    /* Nút xóa nhỏ, chỉ có icon */
+    background: transparent;
+    border: none;
+    color: var(--text-tertiary);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.danger-btn-icon:hover {
+    background-color: var(--danger-background);
+    color: var(--danger-color);
 }
