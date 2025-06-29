@@ -1,0 +1,37 @@
+# .github/workflows/deploy.yml
+name: Build and Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # Chạy workflow mỗi khi có push lên branch 'main'
+
+# Cấp quyền cho workflow để ghi vào branch gh-pages
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Bước 1: Lấy mã nguồn từ repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Bước 2: Tìm và thay thế các biến giữ chỗ bằng secrets
+      # Lệnh 'sed' sẽ tìm chuỗi '%%...%%' trong script.js và thay thế nó
+      # bằng giá trị tương ứng từ GitHub Secrets.
+      - name: Replace API Key and Client ID
+        run: |
+          sed -i "s|%%GOOGLE_API_KEY%%|${{ secrets.GOOGLE_API_KEY }}|g" script.js
+          sed -i "s|%%GOOGLE_CLIENT_ID%%|${{ secrets.GOOGLE_CLIENT_ID }}|g" script.js
+      
+      # Bước 3: Deploy toàn bộ thư mục hiện tại lên branch gh-pages
+      # Thư mục này giờ đã chứa file script.js với key thật.
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4 # Sử dụng phiên bản v4 mới nhất
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./ # Deploy toàn bộ thư mục gốc
+          # Tùy chọn: Thêm commit message để dễ theo dõi
+          commit_message: 'Deploy: ${{ github.event.head_commit.message }}'
