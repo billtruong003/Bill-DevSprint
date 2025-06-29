@@ -1,3 +1,57 @@
+let gapiInited = false;
+let gisInited = false;
+let tokenClient;
+
+// Các hằng số cũng nên ở đây
+const GOOGLE_API_KEY = 'AIzaSyA5QIxzeDT8DmscH765y_JI2QH-_xa46qg';
+const GOOGLE_CLIENT_ID = '841333666544-gq7anebm9p7qkk2o56jvrli5lfen5f9n.apps.googleusercontent.com';
+const GOOGLE_SCOPES = 'https://www.googleapis.com/auth/drive.file';
+
+window.gapiLoaded = () => {
+    gapi.load('client', async () => {
+        await gapi.client.init({
+            apiKey: GOOGLE_API_KEY,
+            discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+        });
+        gapiInited = true;
+        // Kiểm tra và kích hoạt nút đăng nhập nếu cả hai đã sẵn sàng
+        const authBtn = document.getElementById('auth-btn');
+        if (authBtn && gisInited) authBtn.disabled = false;
+    });
+};
+
+window.gisLoaded = () => {
+    async function handleAuthResponse(tokenResponse) {
+        if (tokenResponse.error) {
+            alert("Lỗi xác thực Google. Vui lòng thử lại.");
+            console.error("Google Auth Error:", tokenResponse.error);
+            return;
+        }
+        gapi.client.setToken(tokenResponse);
+        authScreen.style.display = 'none';
+        showLoader('Đang khởi tạo ứng dụng...');
+        try {
+            await startApp();
+        } catch (error) {
+            console.error("Failed to start app:", error);
+            alert("Không thể khởi động ứng dụng. Vui lòng kiểm tra kết nối và thử lại.");
+            hideLoader();
+            authScreen.style.display = 'flex';
+        }
+    }
+
+    tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: GOOGLE_SCOPES,
+        callback: handleAuthResponse,
+    });
+    gisInited = true;
+
+    // Kiểm tra và kích hoạt nút đăng nhập
+    const authBtn = document.getElementById('auth-btn');
+    if (authBtn && gapiInited) authBtn.disabled = false;
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     // Chờ Quill.js và Sortable.js sẵn sàng
     if (typeof Quill === 'undefined' || typeof Sortable === 'undefined') {
@@ -66,11 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const wallpaperLoader = document.getElementById('wallpaper-loader');
     const wallpaperItemTemplate = document.getElementById('wallpaper-item-template');
     // #endregion
-
-    // #region GLOBAL VARIABLES & CONFIG
-    const GOOGLE_API_KEY = '';
-    const GOOGLE_CLIENT_ID = '';
-    const GOOGLE_SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
     let tokenClient;
     let gapiInited = false;
@@ -272,50 +321,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     // #endregion
 
-    // #region GOOGLE AUTH & INIT
-    window.gapiLoaded = () => {
-        gapi.load('client', async () => {
-            await gapi.client.init({
-                apiKey: GOOGLE_API_KEY,
-                discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
-            });
-            gapiInited = true;
-            if (gisInited) authBtn.disabled = false;
-        });
-    };
-
-    window.gisLoaded = () => {
-        tokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: GOOGLE_CLIENT_ID,
-            scope: GOOGLE_SCOPES,
-            callback: handleAuthResponse,
-        });
-        gisInited = true;
-        if (gapiInited) authBtn.disabled = false;
-    };
-
     function handleAuthClick() {
         if (gapiInited && gisInited) {
             tokenClient.requestAccessToken({ prompt: 'consent' });
-        }
-    }
-
-    async function handleAuthResponse(tokenResponse) {
-        if (tokenResponse.error) {
-            alert("Lỗi xác thực Google. Vui lòng thử lại.");
-            console.error("Google Auth Error:", tokenResponse.error);
-            return;
-        }
-        gapi.client.setToken(tokenResponse);
-        authScreen.style.display = 'none';
-        showLoader('Đang khởi tạo ứng dụng...');
-        try {
-            await startApp();
-        } catch (error) {
-            console.error("Failed to start app:", error);
-            alert("Không thể khởi động ứng dụng. Vui lòng kiểm tra kết nối và thử lại.");
-            hideLoader();
-            authScreen.style.display = 'flex';
         }
     }
 
