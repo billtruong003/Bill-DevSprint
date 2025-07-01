@@ -419,6 +419,10 @@ document.addEventListener('DOMContentLoaded', () => {
         renderBoardSwitcher();
         loadUISettings();
         renderBoard();
+
+        if (window.youtubePlayer) {
+            window.youtubePlayer.init(state, saveBoardState);
+        }
     }
 
     function handleLogout() {
@@ -494,7 +498,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 bgImage: '',
                 bgAlpha: 0.3,
                 customColors: { ...defaultCustomColors }
-            }
+            },
+            youtubeBookmarks: [] 
         };
     }
     // #endregion
