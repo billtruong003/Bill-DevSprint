@@ -1997,3 +1997,187 @@ input[type="range"]::-moz-range-thumb {
     background-color: var(--danger-background);
     color: var(--danger-color);
 }
+/* ==========================================================================
+   20. YOUTUBE PLAYER WIDGET
+   ========================================================================== */
+
+#youtube-player-widget {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 999;
+    background-color: var(--surface-1);
+    border: 1px solid var(--border-color-soft);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-elevation-medium);
+    transition: all var(--transition-normal);
+    width: 300px;
+    overflow: hidden;
+}
+
+#youtube-player-widget.collapsed {
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#youtube-player-widget.collapsed .player-expanded-view {
+    display: none;
+}
+
+#youtube-player-widget.collapsed #player-expand-btn {
+    display: flex;
+}
+
+#youtube-player-widget #player-expand-btn {
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    display: none;
+    /* Ẩn mặc định, chỉ hiện khi collapsed */
+    background-color: var(--primary-color);
+    color: var(--text-on-primary);
+}
+
+#youtube-player-widget.collapsed:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px var(--primary-color-background);
+}
+
+
+.player-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 8px 8px 12px;
+    border-bottom: 1px solid var(--border-color-soft);
+    background-color: var(--surface-2);
+}
+
+.player-header .drag-handle {
+    cursor: grab;
+    color: var(--text-tertiary);
+}
+
+.player-header:active .drag-handle {
+    cursor: grabbing;
+}
+
+
+#player-video-title {
+    flex-grow: 1;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-secondary);
+}
+
+.player-controls {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px;
+}
+
+.player-controls .icon-btn {
+    width: 40px;
+    height: 40px;
+}
+
+#player-play-pause-btn .pause-icon {
+    display: none;
+}
+
+#player-play-pause-btn.playing .play-icon {
+    display: none;
+}
+
+#player-play-pause-btn.playing .pause-icon {
+    display: block;
+}
+
+#youtube-iframe-container {
+    /* Ẩn trình phát video nhưng vẫn cho nó hoạt động */
+    width: 1px;
+    height: 1px;
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    opacity: 0;
+}
+
+/* Playlist Modal Styles */
+#bookmark-list-container {
+    max-height: 50vh;
+    overflow-y: auto;
+    padding-right: 8px;
+    /* Cho scrollbar */
+}
+
+#bookmark-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.bookmark-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px;
+    border-radius: var(--radius-md);
+    background-color: var(--surface-2);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.bookmark-item:hover {
+    background-color: var(--primary-color-background-hover);
+}
+
+.bookmark-item.playing {
+    background-color: var(--primary-color-background);
+    border-left: 4px solid var(--primary-color);
+}
+
+.bookmark-item-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    /* Cho phép text-overflow hoạt động */
+}
+
+.bookmark-thumbnail {
+    width: 48px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+}
+
+.bookmark-title {
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bookmark-delete-btn.danger:hover {
+    background-color: var(--danger-background);
+    color: var(--danger-color);
+}
+
+#bookmark-list-empty {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 24px 0;
+}
