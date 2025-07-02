@@ -420,9 +420,18 @@ document.addEventListener('DOMContentLoaded', () => {
         loadUISettings();
         renderBoard();
 
-        if (window.youtubePlayer) {
-            window.youtubePlayer.init(state, saveBoardState);
+        // Tạo một sự kiện tùy chỉnh tên là 'appReady'
+        const appReadyEvent = new CustomEvent('appReady', {
+            detail: {
+                state: state, // Gửi state hiện tại
+                saveCallback: saveBoardState // Gửi hàm callback để lưu
         }
+        });
+
+        // Phát tín hiệu này ra toàn bộ trang (document)
+        // Bất kỳ script nào đang lắng nghe sự kiện này cũng sẽ nhận được.
+        console.log('[Main App] ✅ Firing "appReady" event with state data.');
+        document.dispatchEvent(appReadyEvent);
     }
 
     function handleLogout() {
@@ -651,7 +660,6 @@ document.addEventListener('DOMContentLoaded', () => {
         listTitleText.textContent = listData.title;
         listTitleText.addEventListener('dblclick', () => editTitle(listTitleText, listData.id, 'list'));
         listEl.querySelector('.card-count').textContent = `(${(listData.cards || []).length})`;
-        listEl.querySelector('.delete-list-btn').addEventListener('click', () => deleteList(listData.id));
         listEl.querySelector('.list-options-btn').addEventListener('click', (e) => showListContextMenu(e, listData.id));
         const cardsContainer = listEl.querySelector('.cards-container');
         (listData.cards || []).forEach(cardData => cardsContainer.appendChild(createCardElement(cardData, listData.id)));
